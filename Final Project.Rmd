@@ -1,0 +1,122 @@
+---
+title: "Final Project"
+author: "Zach Walters"
+output: 
+      pdf_document: default
+date: "`r paste('Last Updated:', Sys.Date())`"
+geometry: left=0.5in,right=0.5in,top=0.5in,bottom=0.5in
+urlcolor: blue
+header-includes: \usepackage{subfig}
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+For my final project, I'm choosing to analyzing the hitting statistics of every qualified hitter from the 2023 MLB season. I would like to know which statistic (Position, Age, avg_EV, LA, Hard Hit %) corelates to more home runs. I plan on doing this by comparing scatter plots of these different statistics and their homeruns.Now, I'll explain the meaning of various statistics:\
+\
+**AB** = Number of times the player came up to bat (excluding whent the at bat ends in a walk, hit by pitch, sacrifice fly, or error by the defense)\
+**BA** = Batting average (number of hits/total at-bats)\
+**SLG** = slugging percentage (Number of total bases/total at bast) ex: If a player has a double in 4 at bats he has a slugging percentage of 0.500. If a player has a single in the same number of at bats he as a slugging percentage of 0.250\
+**OBP** = On base percentage (Number of times a player reaches a base (including walks and hit by pitch)/the number of plate appearances)\
+**OPS** = On base plus slugging (on base percentage plus slugging percentage)\
+**EV** = Exit Velocity (average speed that the batter hits the ball)\
+**LA** = Launch Angle (average launch angle that the batter hit the ball)\
+**Hard Hit Percentage** = Percentage of balls in play that the batter hits at least 95 mph\
+
+I got my statistics from baseballsavant.mlb.com, here is what it looks like. Also included are the libraries I will use
+
+```{r, out.width= "50%", out.hieght= "50%"}
+library(ggplot2)
+library(dplyr)
+Batter_Data_2023 <- read.csv(file= "C:/Users/zachj/OneDrive - The Pennsylvania State University/5th Semester/STAT 184/Final Project/stats.csv")
+head(Batter_Data_2023, 10)
+```
+
+\newpage
+
+# Which Position has the most homeruns?
+To start I'd like to take a look at the effect that position has on the number of home runs. To do so, I'll be creating a geom_col where each bar represents the average number of homeruns for players in each position. I included the numerical value associated with each position (P = 1, C = 2, 1B = 3, 2B = 4, 3B = 5, SS = 6, LF = 7, CF = 8, RF = 9, DH = 10(for the sake of simplicity I set DH to 10))
+
+```{r}
+HR_by_pos <- Batter_Data_2023 %>%
+  group_by(player_pos)%>%
+  summarise(
+    count = n(),
+    avg_HR = mean(x= home_run, na.rm= TRUE)
+  )
+
+ggplot(data = HR_by_pos, mapping = aes(x= player_pos, y= avg_HR, fill = player_pos)) +
+  geom_col()
+```
+\
+As we can see 1B, 3B, DH, and RF have higher average home runs by position. This makes sense becuase in baseball strategy (excluding 3B) these positions are generally viewed as more offense based position as it is generally easier to defend at these positions, so teams value players in these position that can generate more runs.
+
+ \newpage
+
+# Which advanced statistic accounts for more homeruns?
+
+Now I'd like to look at EV, LA, and HH% to see if we can look at one to be able to tell if being better in these categories tends to lead to players that has more home runs. I'd like to start by looking at box plots then scatter plot for each statistic.
+
+### Box Plot for HR info based on Exit Velocity
+
+```{r, out.width= "50%", out.hieght= "50%"}
+ggplot(data= Batter_Data_2023, mapping= aes(x= exit_velocity_avg, y= home_run)) +
+  geom_boxplot(aes(group= cut_width(exit_velocity_avg, 0.5)))
+```
+\
+Looking at this, we can see that as the exit velocity increases pretty much all min, q1, median, q3, and max also increase
+
+
+
+### Box plot for HR info based on Launch Angle
+```{r, out.width= "50%", out.hieght= "50%"}
+ggplot(data= Batter_Data_2023, mapping= aes(x= launch_angle_avg, y= home_run)) + 
+  geom_boxplot(aes(group= cut_width(launch_angle_avg, 1)))
+```
+\
+Looking at launch angle shows less of a connection with home runs
+
+\
+
+### Box plot for HR info based on Hard Hit %
+```{r, out.width= "50%", out.hieght= "50%"}
+ggplot(data= Batter_Data_2023, mapping= aes(x= hard_hit_percent, y= home_run)) +
+  geom_boxplot(aes(group = cut_width(hard_hit_percent, 2.5)))
+```
+\
+Looking at this we can see a larger jump between each grouping as hard hit percentage
+
+
+
+### Scatter plot for HR info based on Exit Velocity
+```{r, out.width= "50%", out.hieght= "50%"}
+ggplot(data= Batter_Data_2023, mapping= aes(x= exit_velocity_avg, y= home_run))+
+  geom_point()
+```
+
+
+\newpage
+
+### Scatter plot for HR info based on Launch Angle
+```{r, out.width= "50%", out.hieght= "50%"}
+ggplot(data= Batter_Data_2023, mapping= aes(x= launch_angle_avg, y= home_run)) +
+  geom_point()
+```
+
+
+
+
+### Scatter plot for HR info based on Hard Hit %
+```{r, out.width= "50%", out.hieght= "50%"}
+ggplot(data= Batter_Data_2023, mapping= aes(x= hard_hit_percent, y= home_run)) +
+  geom_point()
+```
+\
+Looking at these three scatter plots, we can see that hard hit percentage follows a trend line more tightly that the other two plots showing that players with higher percentages tend to have more home runs. This makes sense, the more times you hit the ball very hard the better chance you have to hit a homerun.
+
+\
+
+# Conclusion
+In conclusion, players that have higher average exit velocities and higher hard hit percentages tend to have more home runs. Launch angle doesn't play as big of a role as the other two categories.
