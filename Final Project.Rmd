@@ -31,7 +31,9 @@ I got my statistics from baseballsavant.mlb.com, here is what it looks like. Als
 library(ggplot2)
 library(dplyr)
 Batter_Data_2023 <- read.csv(file= "C:/Users/zachj/OneDrive - The Pennsylvania State University/5th Semester/STAT 184/Final Project/stats.csv")
-head(Batter_Data_2023, 10)
+Batter <- Batter_Data_2023%>%
+  select(player_pos, pos_num, home_run, exit_velocity_avg, launch_angle_avg, hard_hit_percent)
+head(Batter)
 ```
 
 \newpage
@@ -40,7 +42,7 @@ head(Batter_Data_2023, 10)
 To start I'd like to take a look at the effect that position has on the number of home runs. To do so, I'll be creating a geom_col where each bar represents the average number of homeruns for players in each position. I included the numerical value associated with each position (P = 1, C = 2, 1B = 3, 2B = 4, 3B = 5, SS = 6, LF = 7, CF = 8, RF = 9, DH = 10(for the sake of simplicity I set DH to 10))
 
 ```{r}
-HR_by_pos <- Batter_Data_2023 %>%
+HR_by_pos <- Batter %>%
   group_by(player_pos)%>%
   summarise(
     count = n(),
@@ -62,7 +64,7 @@ Now I'd like to look at EV, LA, and HH% to see if we can look at one to be able 
 ### Box Plot for HR info based on Exit Velocity
 
 ```{r, out.width= "50%", out.hieght= "50%"}
-ggplot(data= Batter_Data_2023, mapping= aes(x= exit_velocity_avg, y= home_run)) +
+ggplot(data= Batter, mapping= aes(x= exit_velocity_avg, y= home_run)) +
   geom_boxplot(aes(group= cut_width(exit_velocity_avg, 0.5)))
 ```
 \
@@ -72,7 +74,7 @@ Looking at this, we can see that as the exit velocity increases pretty much all 
 
 ### Box plot for HR info based on Launch Angle
 ```{r, out.width= "50%", out.hieght= "50%"}
-ggplot(data= Batter_Data_2023, mapping= aes(x= launch_angle_avg, y= home_run)) + 
+ggplot(data= Batter, mapping= aes(x= launch_angle_avg, y= home_run)) + 
   geom_boxplot(aes(group= cut_width(launch_angle_avg, 1)))
 ```
 \
@@ -82,7 +84,7 @@ Looking at launch angle shows less of a connection with home runs
 
 ### Box plot for HR info based on Hard Hit %
 ```{r, out.width= "50%", out.hieght= "50%"}
-ggplot(data= Batter_Data_2023, mapping= aes(x= hard_hit_percent, y= home_run)) +
+ggplot(data= Batter, mapping= aes(x= hard_hit_percent, y= home_run)) +
   geom_boxplot(aes(group = cut_width(hard_hit_percent, 2.5)))
 ```
 \
@@ -92,7 +94,7 @@ Looking at this we can see a larger jump between each grouping as hard hit perce
 
 ### Scatter plot for HR info based on Exit Velocity
 ```{r, out.width= "50%", out.hieght= "50%"}
-ggplot(data= Batter_Data_2023, mapping= aes(x= exit_velocity_avg, y= home_run))+
+ggplot(data= Batter, mapping= aes(x= exit_velocity_avg, y= home_run))+
   geom_point()
 ```
 
@@ -101,7 +103,7 @@ ggplot(data= Batter_Data_2023, mapping= aes(x= exit_velocity_avg, y= home_run))+
 
 ### Scatter plot for HR info based on Launch Angle
 ```{r, out.width= "50%", out.hieght= "50%"}
-ggplot(data= Batter_Data_2023, mapping= aes(x= launch_angle_avg, y= home_run)) +
+ggplot(data= Batter, mapping= aes(x= launch_angle_avg, y= home_run)) +
   geom_point()
 ```
 
@@ -110,7 +112,7 @@ ggplot(data= Batter_Data_2023, mapping= aes(x= launch_angle_avg, y= home_run)) +
 
 ### Scatter plot for HR info based on Hard Hit %
 ```{r, out.width= "50%", out.hieght= "50%"}
-ggplot(data= Batter_Data_2023, mapping= aes(x= hard_hit_percent, y= home_run)) +
+ggplot(data= Batter, mapping= aes(x= hard_hit_percent, y= home_run)) +
   geom_point()
 ```
 \
